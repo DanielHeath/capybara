@@ -10,6 +10,8 @@ CHROME_DRIVER = :selenium_chrome
 
 Selenium::WebDriver::Chrome.path = '/usr/bin/google-chrome-beta' if ENV['CI'] && ENV['CHROME_BETA']
 
+# Webdrivers::Chromedriver.required_version = '75.0.3770.8'
+
 browser_options = ::Selenium::WebDriver::Chrome::Options.new
 browser_options.headless! if ENV['HEADLESS']
 browser_options.add_option(:w3c, ENV['W3C'] != 'false')
@@ -125,10 +127,11 @@ RSpec.describe 'Capybara::Session with chrome' do
   describe 'log access' do
     before { skip 'Only makes sense in W3C mode' if ENV['W3C'] == 'false' }
 
-    it 'errors when getting log types' do
+    it 'does not error getting log types' do
+      skip if Gem::Version.new(session.driver.browser.capabilities['chrome']['chromedriverVersion'].split[0]) < Gem::Version.new('75.0.3770.90')
       expect do
         session.driver.browser.manage.logs.available_types
-      end.to raise_error(NotImplementedError, /Chromedriver 75\+ defaults to W3C mode/)
+      end.not_to raise_error
     end
 
     it 'does not error when getting logs' do
