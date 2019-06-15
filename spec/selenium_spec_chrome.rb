@@ -10,9 +10,10 @@ CHROME_DRIVER = :selenium_chrome
 
 Selenium::WebDriver::Chrome.path = '/usr/bin/google-chrome-beta' if ENV['CI'] && ENV['CHROME_BETA']
 
-browser_options = ::Selenium::WebDriver::Chrome::Options.new
-browser_options.headless! if ENV['HEADLESS']
-browser_options.add_option(:w3c, ENV['W3C'] != 'false')
+browser_options = ::Selenium::WebDriver::Chrome::Options.new.tap do |opts|
+  opts.headless! if ENV['HEADLESS']
+  opts.add_option(:w3c, ENV['W3C'] != 'false')
+end
 
 Capybara.register_driver :selenium_chrome do |app|
   Capybara::Selenium::Driver.new(app, browser: :chrome, options: browser_options, timeout: 30).tap do |driver|
@@ -23,9 +24,11 @@ end
 Capybara.register_driver :selenium_chrome_not_clear_storage do |app|
   chrome_options = {
     browser: :chrome,
-    options: browser_options
+    options: browser_options,
+    clear_local_storage: false,
+    clear_session_storage: false
   }
-  Capybara::Selenium::Driver.new(app, chrome_options.merge(clear_local_storage: false, clear_session_storage: false))
+  Capybara::Selenium::Driver.new(app, chrome_options)
 end
 
 Capybara.register_driver :selenium_driver_subclass_with_chrome do |app|
