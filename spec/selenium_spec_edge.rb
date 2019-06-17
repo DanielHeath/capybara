@@ -11,6 +11,8 @@ unless ENV['CI']
   Selenium::WebDriver::EdgeChrome.path = '/Applications/Microsoft Edge Canary.app/Contents/MacOS/Microsoft Edge Canary'
 end
 
+Webdrivers::Edgedriver.required_version = '76.0.168' if ENV['CI']
+
 Capybara.register_driver :selenium_edge do |app|
   # ::Selenium::WebDriver.logger.level = "debug"
   Capybara::Selenium::Driver.new(app, browser: :edge_chrome).tap do |driver|
